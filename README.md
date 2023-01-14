@@ -36,7 +36,3 @@ XGBoost is one of the most popular ML algorithms and is known to yield highly ac
 
 Blackboost is a gradient boosting method where regression trees are utilized as base-learners.
 
-## Performance Measure
-
-Since I have an imbalanced dataset, using “accuracy” as a performance measure in a classification task would be misleading. As an alternative, I use F-1 score, which is a more suitable metric for imbalanced data.
-
