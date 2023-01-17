@@ -1,5 +1,7 @@
 # Credit Risk Analysis
 
+The dataset can be accessed by this link: https://drive.google.com/file/d/102q3Ki7qN0pAW2i-WJsOYP1dhO9VEIaW/view?usp=share_link
+
 ## Problem Description
 In order to minimize loss and maximize profits from lending, banks require careful assessment of their borrowers. This has led to credit risk computation becoming a commonly used application of statistics and data science.
 
