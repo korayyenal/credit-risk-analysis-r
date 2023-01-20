@@ -38,6 +38,9 @@ library(ggplot2)
 library(adabag)
 library(xgboost)
 library(mboost)
+library(viridis)
+library(hrbrthemes)
+require(scales)
 ```
 
 ``` r
@@ -45,13 +48,16 @@ source("functions.R")
 ```
 
 ``` r
+set.seed(234) 
 creditData<-read.csv("CreditGame.csv")
 ```
 
 ## 1. Exploratory Data Analysis
 
-We first examine the dataset to identify variables types and the dataset
-features, as well as the columns with empty cells.
+## 1. Exploratory Data Analysis
+
+The first step is to examine the dataset to identify variables types and
+the dataset features, as well as features with missing values.
 
 ``` r
 str(creditData)
@@ -94,24 +100,27 @@ str(creditData)
   numerical, 3 are categorical and 25 are integer.
 
 ``` r
-table(creditData$DEFAULT)
+prop.table(table(creditData$DEFAULT))
 ```
 
     ## 
-    ##      0      1 
-    ## 950000  50000
+    ##    0    1 
+    ## 0.95 0.05
 
-- 950,000 (95%) applicants didn’t default; 50,000 (5%) of them
-  defaulted. I have an imbalanced dataset.
+- 95% of applicants didn’t default; only 5% defaulted. I have an
+  imbalanced dataset.
 
 ``` r
 # net income
-hist(creditData$REV_NET)
+rev <- ggplot(creditData, aes(REV_NET))
+rev <- rev + geom_histogram(stat="count") + labs(title = "REV_NET: Net Income", x = "net income")+
+  theme(axis.text.x=element_text(angle=45,hjust=0.8,vjust=0.5))
+rev
 ```
 
 ![](credit_risk_analysis_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
 
-- The net income histogram is right-skewed, with a mean value of around
+- The net income histogram is right-skewed with a mean value of around
   \$48000 and a median of \$41000.
 
 ``` r
@@ -128,46 +137,44 @@ age
 
 ``` r
 # employment status
-round(table(creditData$ST_EMPL)/nrow(creditData),2)
+empl <- ggplot(creditData, aes(ST_EMPL))
+empl <- empl + geom_bar(aes(y = (..count..)/sum(..count..))) + labs(title = "ST_EMPL: Employment Status", y = "Percent", x = "Employment Status") +
+  scale_y_continuous(labels=percent) + 
+  theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.5))
+empl
 ```
 
-    ## 
-    ##         P    R    T 
-    ## 0.10 0.32 0.48 0.10
+![](credit_risk_analysis_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
 
-- In total, 52% of applicants aren’t full-time employees, which may
-  indicate risk. 32% of applicants are part-time employees.
+- Majority of applicants aren’t full-time employees, while 32% of
+  applicants are part-time employees.
 
 ``` r
 # residence type
-round(table(creditData$TYP_RES)/nrow(creditData),2)
+res <- ggplot(creditData, aes(TYP_RES))
+res <- res + geom_bar(aes(y = (..count..)/sum(..count..))) + labs(title = "TYP_RES: Residence Type", y = "Percent", x = "Residence Type") +
+  scale_y_continuous(labels=percent) + 
+  theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.5))
+res
 ```
 
-    ## 
-    ##    A    L    P 
-    ## 0.23 0.52 0.25
+![](credit_risk_analysis_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
 
-- 52% of applicants are tenants.
+- 52% of applicants are tenants, while 25% of applicants are landlords.
 
 ``` r
-# number of borrowers
-NB <- ggplot(creditData, aes(NB_EMPT))
-NB <- NB + geom_histogram(stat="count") + labs(title = "NB_EMPT: Number of borrowers")+
+# residence type
+number <- ggplot(creditData, aes(NB_EMPT))
+number <- number + geom_bar(aes(y = (..count..)/sum(..count..))) + labs(title = "NB_EMPT: Number of Borrowers", y = "Percent", x = "Number of Borrowers") +
+  scale_y_continuous(labels=percent) + 
   theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.5))
-NB
+number
 ```
 
 ![](credit_risk_analysis_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
 
-``` r
-round((prop.table(table(creditData$NB_EMPT))*100),1)
-```
-
-    ## 
-    ##    1    2 
-    ## 86.5 13.5
-
-- 85% of applicants are individual, while 15% are two people applicants
+- 85% of the total number of loans are issued to one person, while 15%
+  of the total number of loans are issued to two people.
 
 ``` r
 # savings value
@@ -181,6 +188,34 @@ EPAR
 
 - Savings value distribution is also right skewed; majority of
   applicants do not have any savings or very little savings.
+
+``` r
+# default by age
+creditData %>% count(AGE_D, DEFAULT) %>%
+  ggplot() +  labs(title = "Default by Age", y = "Percent") +
+  geom_col(aes(x= AGE_D, y = n, fill= DEFAULT), position = 'fill')
+```
+
+![](credit_risk_analysis_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
+
+- The plot indicates that younger people default more. This is expected;
+  young adults tend to have less financial stability compared to older
+  adults. The difference appears significant, however I need further
+  statistical analysis to support this.
+
+``` r
+# default by employment
+creditData %>% count(ST_EMPL, DEFAULT) %>%
+  ggplot() + labs(title = "Default by Employment", y = "Percent") +
+  geom_col(aes(x= ST_EMPL, y = n, fill= DEFAULT), position = 'fill')
+```
+
+![](credit_risk_analysis_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
+
+- Applicants with regular/full-time jobs (R) tend to default less than
+  others, which is expected. Self employed people (T) and the unlabeled
+  category (““) tend to default more. However, the difference does not
+  appear significant.
 
 ## 2. Data Pre-processing
 
@@ -286,7 +321,7 @@ corrplot(correlations, type="lower", method="number", order="hclust", number.cex
          tl.srt=45, tl.cex=0.50, col=brewer.pal(n=5, name="Spectral"))
 ```
 
-![](credit_risk_analysis_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
+![](credit_risk_analysis_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
 
 ``` r
 creditData$AGE_D[is.na(creditData$AGE_D)] <- median(creditData$AGE_D,  na.rm = TRUE)
@@ -511,7 +546,7 @@ credit_lasso_cv<- cv.glmnet(x=credit_train_X, y=credit_train_Y, family = "binomi
 plot(credit_lasso_cv)
 ```
 
-![](credit_risk_analysis_files/figure-gfm/unnamed-chunk-22-1.png)<!-- -->
+![](credit_risk_analysis_files/figure-gfm/unnamed-chunk-24-1.png)<!-- -->
 
 ``` r
 coef(credit_lasso, s=credit_lasso_cv$lambda.1se)
@@ -519,35 +554,35 @@ coef(credit_lasso, s=credit_lasso_cv$lambda.1se)
 
     ## 30 x 1 sparse Matrix of class "dgCMatrix"
     ##                         s1
-    ## (Intercept)  -1.534731e+00
-    ## NB_EMPT      -1.616952e-01
-    ## R_ATD        -1.656043e+00
-    ## DUREE         1.976938e-01
-    ## PRT_VAL       2.630081e+00
-    ## AGE_D        -1.808708e-02
-    ## REV_BT       -4.898167e-06
-    ## REV_NET       .           
-    ## TYP_RESL     -5.148428e-01
-    ## TYP_RESP     -6.417984e-01
-    ## ST_EMPLP     -1.133842e-01
-    ## ST_EMPLR     -3.067331e-01
-    ## ST_EMPLT      4.792865e-02
-    ## MNT_EPAR      2.428000e-06
-    ## NB_ER_6MS     7.708673e-02
-    ## NB_ER_12MS    1.764312e-01
-    ## NB_DEC_12MS   9.354392e-02
-    ## NB_OPER       9.078223e-03
-    ## NB_COUR       5.083251e-03
-    ## NB_INTR_1M    2.464743e-02
-    ## PIR_DEL       5.899426e-01
-    ## NB_DEL_30     8.821367e-02
-    ## NB_DEL_60     1.844007e-01
-    ## NB_DEL_90     3.614656e-01
-    ## MNT_PASS      1.556080e-06
-    ## MNT_ACT      -3.192873e-06
-    ## MNT_AUT_REN  -3.116561e-05
-    ## MNT_UTIL_REN  4.540558e-05
-    ## NB_SATI      -5.204820e-02
+    ## (Intercept)  -1.549731e+00
+    ## NB_EMPT      -1.158470e-01
+    ## R_ATD        -1.554476e+00
+    ## DUREE         1.897473e-01
+    ## PRT_VAL       2.523281e+00
+    ## AGE_D        -1.652102e-02
+    ## REV_BT       -4.586218e-06
+    ## REV_NET      -6.789860e-07
+    ## TYP_RESL     -5.103484e-01
+    ## TYP_RESP     -5.987834e-01
+    ## ST_EMPLP     -8.577060e-02
+    ## ST_EMPLR     -2.844994e-01
+    ## ST_EMPLT      3.778981e-02
+    ## MNT_EPAR      2.078842e-06
+    ## NB_ER_6MS     7.260999e-02
+    ## NB_ER_12MS    1.717143e-01
+    ## NB_DEC_12MS   9.704198e-02
+    ## NB_OPER       .           
+    ## NB_COUR       .           
+    ## NB_INTR_1M    1.983563e-02
+    ## PIR_DEL       5.877923e-01
+    ## NB_DEL_30     7.166133e-02
+    ## NB_DEL_60     1.739399e-01
+    ## NB_DEL_90     3.509019e-01
+    ## MNT_PASS      1.222664e-06
+    ## MNT_ACT      -2.857718e-06
+    ## MNT_AUT_REN  -2.674624e-05
+    ## MNT_UTIL_REN  3.961890e-05
+    ## NB_SATI      -3.679513e-02
     ## MNT_DEMANDE   .
 
 The cross validation procedure selects 29 out of 30 variables as
@@ -563,7 +598,7 @@ fn_rate_lasso <- fnRate(pred_lasso_test, creditDataTest, 0.5)
 print(paste0("Lasso fn rate: ", round(fn_rate_lasso,2)))
 ```
 
-    ## [1] "Lasso fn rate: 0.51"
+    ## [1] "Lasso fn rate: 0.53"
 
 ``` r
 f1_lasso <- f1Score(pred_lasso_test,creditDataTest,0.5)
@@ -576,13 +611,13 @@ print(paste0("Lasso f1 score: ", round(f1_lasso,2)))
 optcut_lasso <- rocCurve(pred_lasso_test, credit_test_Y)
 ```
 
-![](credit_risk_analysis_files/figure-gfm/unnamed-chunk-23-1.png)<!-- -->
+![](credit_risk_analysis_files/figure-gfm/unnamed-chunk-25-1.png)<!-- -->
 
 ``` r
 print(paste0("Lasso optimal fn rate: ", round(1-optcut_lasso[1],2)))
 ```
 
-    ## [1] "Lasso optimal fn rate: 0.31"
+    ## [1] "Lasso optimal fn rate: 0.29"
 
 #### XGBoost
 
@@ -611,59 +646,59 @@ modelXgboostTuned <- xgb.train(data = dtrain,
                         watchlist=watchlist)
 ```
 
-    ## [1]  train-logloss:0.640950  test-logloss:0.642230 
+    ## [1]  train-logloss:0.639884  test-logloss:0.641350 
     ## Multiple eval metrics are present. Will use test_logloss for early stopping.
     ## Will train until test_logloss hasn't improved in 3 rounds.
     ## 
-    ## [2]  train-logloss:0.605082  test-logloss:0.606762 
-    ## [3]  train-logloss:0.581297  test-logloss:0.584431 
-    ## [4]  train-logloss:0.562699  test-logloss:0.566935 
-    ## [5]  train-logloss:0.547715  test-logloss:0.552165 
-    ## [6]  train-logloss:0.533596  test-logloss:0.537661 
-    ## [7]  train-logloss:0.523229  test-logloss:0.528123 
-    ## [8]  train-logloss:0.504364  test-logloss:0.510131 
-    ## [9]  train-logloss:0.493534  test-logloss:0.500789 
-    ## [10] train-logloss:0.485249  test-logloss:0.494132 
-    ## [11] train-logloss:0.474675  test-logloss:0.484359 
-    ## [12] train-logloss:0.468119  test-logloss:0.478214 
-    ## [13] train-logloss:0.463300  test-logloss:0.473808 
-    ## [14] train-logloss:0.456491  test-logloss:0.467836 
-    ## [15] train-logloss:0.447821  test-logloss:0.458598 
-    ## [16] train-logloss:0.442977  test-logloss:0.454229 
-    ## [17] train-logloss:0.435011  test-logloss:0.445909 
-    ## [18] train-logloss:0.432119  test-logloss:0.443812 
-    ## [19] train-logloss:0.428470  test-logloss:0.440735 
-    ## [20] train-logloss:0.422805  test-logloss:0.435040 
-    ## [21] train-logloss:0.418079  test-logloss:0.430414 
-    ## [22] train-logloss:0.406270  test-logloss:0.418154 
-    ## [23] train-logloss:0.400087  test-logloss:0.411987 
-    ## [24] train-logloss:0.388365  test-logloss:0.401357 
-    ## [25] train-logloss:0.384941  test-logloss:0.398425 
-    ## [26] train-logloss:0.383407  test-logloss:0.397606 
-    ## [27] train-logloss:0.379480  test-logloss:0.393518 
-    ## [28] train-logloss:0.377907  test-logloss:0.392432 
-    ## [29] train-logloss:0.372029  test-logloss:0.386851 
-    ## [30] train-logloss:0.361184  test-logloss:0.376900 
-    ## [31] train-logloss:0.354633  test-logloss:0.370639 
-    ## [32] train-logloss:0.350028  test-logloss:0.366428 
-    ## [33] train-logloss:0.347002  test-logloss:0.363337 
-    ## [34] train-logloss:0.342359  test-logloss:0.358864 
-    ## [35] train-logloss:0.339598  test-logloss:0.356439 
-    ## [36] train-logloss:0.331261  test-logloss:0.348912 
-    ## [37] train-logloss:0.327702  test-logloss:0.345713 
-    ## [38] train-logloss:0.326561  test-logloss:0.344840 
-    ## [39] train-logloss:0.323200  test-logloss:0.341788 
-    ## [40] train-logloss:0.321904  test-logloss:0.340728 
-    ## [41] train-logloss:0.318054  test-logloss:0.337080 
-    ## [42] train-logloss:0.314673  test-logloss:0.333780 
-    ## [43] train-logloss:0.309953  test-logloss:0.328693 
-    ## [44] train-logloss:0.305736  test-logloss:0.324924 
-    ## [45] train-logloss:0.302971  test-logloss:0.322455 
-    ## [46] train-logloss:0.297549  test-logloss:0.317360 
-    ## [47] train-logloss:0.292053  test-logloss:0.312142 
-    ## [48] train-logloss:0.287103  test-logloss:0.307678 
-    ## [49] train-logloss:0.285031  test-logloss:0.305531 
-    ## [50] train-logloss:0.281283  test-logloss:0.302029
+    ## [2]  train-logloss:0.607577  test-logloss:0.610023 
+    ## [3]  train-logloss:0.581579  test-logloss:0.586139 
+    ## [4]  train-logloss:0.563736  test-logloss:0.569378 
+    ## [5]  train-logloss:0.549376  test-logloss:0.555872 
+    ## [6]  train-logloss:0.535741  test-logloss:0.543427 
+    ## [7]  train-logloss:0.520038  test-logloss:0.527838 
+    ## [8]  train-logloss:0.501806  test-logloss:0.512325 
+    ## [9]  train-logloss:0.490386  test-logloss:0.501303 
+    ## [10] train-logloss:0.482953  test-logloss:0.493795 
+    ## [11] train-logloss:0.475004  test-logloss:0.486999 
+    ## [12] train-logloss:0.465524  test-logloss:0.478087 
+    ## [13] train-logloss:0.456186  test-logloss:0.467745 
+    ## [14] train-logloss:0.447523  test-logloss:0.460177 
+    ## [15] train-logloss:0.430220  test-logloss:0.443797 
+    ## [16] train-logloss:0.426842  test-logloss:0.441186 
+    ## [17] train-logloss:0.423513  test-logloss:0.438328 
+    ## [18] train-logloss:0.418411  test-logloss:0.433371 
+    ## [19] train-logloss:0.410119  test-logloss:0.425863 
+    ## [20] train-logloss:0.405599  test-logloss:0.421525 
+    ## [21] train-logloss:0.402893  test-logloss:0.419287 
+    ## [22] train-logloss:0.386699  test-logloss:0.403121 
+    ## [23] train-logloss:0.380749  test-logloss:0.397194 
+    ## [24] train-logloss:0.375552  test-logloss:0.392508 
+    ## [25] train-logloss:0.371566  test-logloss:0.388996 
+    ## [26] train-logloss:0.368705  test-logloss:0.385854 
+    ## [27] train-logloss:0.359557  test-logloss:0.376304 
+    ## [28] train-logloss:0.357647  test-logloss:0.374898 
+    ## [29] train-logloss:0.355851  test-logloss:0.373477 
+    ## [30] train-logloss:0.354462  test-logloss:0.372574 
+    ## [31] train-logloss:0.350495  test-logloss:0.368387 
+    ## [32] train-logloss:0.347182  test-logloss:0.364936 
+    ## [33] train-logloss:0.345686  test-logloss:0.363731 
+    ## [34] train-logloss:0.342782  test-logloss:0.361041 
+    ## [35] train-logloss:0.336118  test-logloss:0.354945 
+    ## [36] train-logloss:0.328928  test-logloss:0.348370 
+    ## [37] train-logloss:0.327218  test-logloss:0.346939 
+    ## [38] train-logloss:0.325598  test-logloss:0.345433 
+    ## [39] train-logloss:0.320825  test-logloss:0.340944 
+    ## [40] train-logloss:0.317593  test-logloss:0.337821 
+    ## [41] train-logloss:0.316571  test-logloss:0.337064 
+    ## [42] train-logloss:0.312832  test-logloss:0.333609 
+    ## [43] train-logloss:0.306170  test-logloss:0.327221 
+    ## [44] train-logloss:0.304804  test-logloss:0.325809 
+    ## [45] train-logloss:0.300799  test-logloss:0.321580 
+    ## [46] train-logloss:0.299670  test-logloss:0.320612 
+    ## [47] train-logloss:0.297628  test-logloss:0.318819 
+    ## [48] train-logloss:0.295150  test-logloss:0.316591 
+    ## [49] train-logloss:0.294556  test-logloss:0.316170 
+    ## [50] train-logloss:0.291299  test-logloss:0.313141
 
 ##### Prediction
 
@@ -674,7 +709,7 @@ fn_rate_xgb <- fnRateXgb(predXgboost, creditDataTest, factorToNumeric(creditData
 print(paste0("XGBoost fn rate: ", round(fn_rate_xgb,2)))
 ```
 
-    ## [1] "XGBoost fn rate: 0.77"
+    ## [1] "XGBoost fn rate: 0.76"
 
 ``` r
 f1_xgb <- f1ScoreXgb(predXgboost,creditDataTest, factorToNumeric(creditDataTest$DEFAULT), 0.5)
@@ -687,7 +722,7 @@ print(paste0("XGBoost f1 score: ", round(f1_xgb,2)))
 optcut_xgb <- rocCurve(predXgboost, creditDataTest$DEFAULT)
 ```
 
-![](credit_risk_analysis_files/figure-gfm/unnamed-chunk-26-1.png)<!-- -->
+![](credit_risk_analysis_files/figure-gfm/unnamed-chunk-28-1.png)<!-- -->
 
 ``` r
 print(paste0("XGBoost optimal fn rate: ", round(1-optcut_xgb[1],2)))
@@ -725,7 +760,7 @@ print(paste0("Adaboost f1 score: ", round(f1_ada,2)))
 optcut_ada <- rocCurve(pred_ada$prob[,2], creditDataTest$DEFAULT)
 ```
 
-![](credit_risk_analysis_files/figure-gfm/unnamed-chunk-28-1.png)<!-- -->
+![](credit_risk_analysis_files/figure-gfm/unnamed-chunk-30-1.png)<!-- -->
 
 ``` r
 print(paste0("Adaboost optimal fn rate: ", round(1-optcut_ada[1],2)))
@@ -739,7 +774,7 @@ print(paste0("Adaboost optimal fn rate: ", round(1-optcut_ada[1],2)))
 print(paste0("Lasso optimal fn rate: ", round(1-optcut_lasso[1],2)))
 ```
 
-    ## [1] "Lasso optimal fn rate: 0.31"
+    ## [1] "Lasso optimal fn rate: 0.29"
 
 ``` r
 print(paste0("XGBoost optimal fn rate: ", round(1-optcut_xgb[1],2)))
@@ -808,12 +843,12 @@ output of the regression task is the “predicted loan amount requested”.
 ##### Data Preparation
 
 ``` r
-creditDataTrain_regr <- creditDataTrain
+creditDataTrain_regr <- creditDataTrain_smote
 creditDataTest_regr <- creditDataTest
 creditDataTrain_regr$DEFAULT <- NULL
 creditDataTest_regr$DEFAULT <- NULL
 
-dtrain_regr <- dfToDMatrixRegr(creditDataTrain)
+dtrain_regr <- dfToDMatrixRegr(creditDataTrain_smote)
 dtest_regr <- dfToDMatrixRegr(creditDataValid)
 dvalid_regr <- dfToDMatrixRegr(creditDataTest)
 ```
@@ -848,30 +883,31 @@ modelXgboostTuned_regr <- xgb.train(data = dtrain_regr,
                              watchlist = watchlist)
 ```
 
-    ## [1]  train-rmse:18723.640908 test-rmse:18690.236088 
+    ## [1]  train-rmse:18626.486449 test-rmse:18708.443739 
     ## Multiple eval metrics are present. Will use test_rmse for early stopping.
     ## Will train until test_rmse hasn't improved in 3 rounds.
     ## 
-    ## [2]  train-rmse:14973.316165 test-rmse:14943.033094 
-    ## [3]  train-rmse:12738.631237 test-rmse:12712.869641 
-    ## [4]  train-rmse:11485.934995 test-rmse:11465.005024 
-    ## [5]  train-rmse:10819.109859 test-rmse:10802.710741 
-    ## [6]  train-rmse:10476.784254 test-rmse:10464.125774 
-    ## [7]  train-rmse:10304.758590 test-rmse:10295.062091 
-    ## [8]  train-rmse:10219.368904 test-rmse:10211.730433 
-    ## [9]  train-rmse:10177.174805 test-rmse:10171.148208 
-    ## [10] train-rmse:10156.219839 test-rmse:10151.526890 
-    ## [11] train-rmse:10145.877548 test-rmse:10142.114116 
-    ## [12] train-rmse:10140.693365 test-rmse:10137.636775 
-    ## [13] train-rmse:10138.005070 test-rmse:10135.669421 
-    ## [14] train-rmse:10136.613476 test-rmse:10134.793773 
-    ## [15] train-rmse:10135.817915 test-rmse:10134.445789 
-    ## [16] train-rmse:10135.307623 test-rmse:10134.363612 
-    ## [17] train-rmse:10134.935425 test-rmse:10134.369692 
-    ## [18] train-rmse:10134.695174 test-rmse:10134.391877 
-    ## [19] train-rmse:10134.413233 test-rmse:10134.417071 
+    ## [2]  train-rmse:14864.565828 test-rmse:14963.569390 
+    ## [3]  train-rmse:12617.539142 test-rmse:12733.419071 
+    ## [4]  train-rmse:11354.932719 test-rmse:11484.621932 
+    ## [5]  train-rmse:10681.522203 test-rmse:10820.742686 
+    ## [6]  train-rmse:10335.125283 test-rmse:10480.780125 
+    ## [7]  train-rmse:10160.651049 test-rmse:10310.465659 
+    ## [8]  train-rmse:10073.512585 test-rmse:10225.414435 
+    ## [9]  train-rmse:10030.244550 test-rmse:10183.712529 
+    ## [10] train-rmse:10008.201181 test-rmse:10163.345766 
+    ## [11] train-rmse:9997.150061  test-rmse:10153.511832 
+    ## [12] train-rmse:9991.426263  test-rmse:10148.707686 
+    ## [13] train-rmse:9988.015764  test-rmse:10146.734230 
+    ## [14] train-rmse:9986.018073  test-rmse:10145.799172 
+    ## [15] train-rmse:9984.754897  test-rmse:10145.367995 
+    ## [16] train-rmse:9983.717806  test-rmse:10145.295610 
+    ## [17] train-rmse:9982.923911  test-rmse:10145.255900 
+    ## [18] train-rmse:9982.339468  test-rmse:10145.268712 
+    ## [19] train-rmse:9981.581484  test-rmse:10145.292788 
+    ## [20] train-rmse:9980.918174  test-rmse:10145.552998 
     ## Stopping. Best iteration:
-    ## [16] train-rmse:10135.307623 test-rmse:10134.363612
+    ## [17] train-rmse:9982.923911  test-rmse:10145.255900
 
 XGBoost has a range of hyperparameters, which requires tuning. Our goal
 in hyperparameter tuning well on an unseen data. With this purpose in
@@ -898,7 +934,7 @@ xgb_rmse = sqrt(mean((predXgboost_regr-creditDataTest$MNT_DEMANDE)^2))
 xgb_rmse
 ```
 
-    ## [1] 10134.16
+    ## [1] 10146.26
 
 ##### Variable Importance
 
@@ -907,15 +943,20 @@ importance_matrix <- xgb.importance(model = modelXgboostTuned_regr)
 xgb.plot.importance(importance_matrix, top_n = 10, measure = "Gain")
 ```
 
-![](credit_risk_analysis_files/figure-gfm/unnamed-chunk-34-1.png)<!-- -->
+![](credit_risk_analysis_files/figure-gfm/unnamed-chunk-36-1.png)<!-- -->
 
-- Variable importance graph shows that Savings Value (MNT_EPAR) is the
-  most important variable followed by value of financial assets
-  (MNT_ACT) and value of financial liabilities (MNT_PASS). This makes
-  sense because clients with a high savings or financial assets value
-  tend to default less and can payback their debt by their savings and
-  assets, whereas clients with high financial liabilities tend to
-  default more often.
+Variable importance graph shows that the three most important variables
+are:
+
+1.  Total used amount of revolving credit (MNT_UTIL_REN),
+2.  Requested loan amount over the value of the goods (PRT_VAL), and
+3.  Value of financial liabilities (MNT_PASS).
+
+The results make sense; clients with high financial liabilities or
+credit utilization tend to have a higher risk of default, while the
+ratio of requested loan amount to value of the goods tend to give a good
+indication as to whether the client can payback their debt by their
+savings or assets.
 
 #### Blackboost
 
@@ -933,13 +974,13 @@ black_rmse = sqrt(mean((pred_gb-creditDataTest$MNT_DEMANDE)^2))
 print(paste0("XGBoost RMSE score: ", round(xgb_rmse,2)))
 ```
 
-    ## [1] "XGBoost RMSE score: 10134.16"
+    ## [1] "XGBoost RMSE score: 10146.26"
 
 ``` r
 print(paste0("Blackboost RMSE score: ", round(black_rmse,2)))
 ```
 
-    ## [1] "Blackboost RMSE score: 10133.81"
+    ## [1] "Blackboost RMSE score: 10143.24"
 
 The two algorithms have very similar RMSE values, the best performing
-algorithm is blackboost with RMSE of 10130.
+algorithm is blackboost with RMSE around 10,100.
