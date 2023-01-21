@@ -54,8 +54,6 @@ creditData<-read.csv("CreditGame.csv")
 
 ## 1. Exploratory Data Analysis
 
-## 1. Exploratory Data Analysis
-
 The first step is to examine the dataset to identify variables types and
 the dataset features, as well as features with missing values.
 
@@ -214,8 +212,8 @@ creditData %>% count(ST_EMPL, DEFAULT) %>%
 
 - Applicants with regular/full-time jobs (R) tend to default less than
   others, which is expected. Self employed people (T) and the unlabeled
-  category (““) tend to default more. However, the difference does not
-  appear significant.
+  category with an empty string (““) tend to default more. However, the
+  difference does not appear significant.
 
 ## 2. Data Pre-processing
 
