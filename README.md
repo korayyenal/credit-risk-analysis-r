@@ -3,38 +3,30 @@
 The dataset can be accessed by this link: https://drive.google.com/file/d/102q3Ki7qN0pAW2i-WJsOYP1dhO9VEIaW/view?usp=share_link
 
 ## Problem Description
-In order to minimize loss and maximize profits from lending, banks require careful assessment of their borrowers. This has led to credit risk computation becoming a commonly used application of statistics and data science.
 
-In this notebook, I take a data set of loan applications and build a predictive model for making a decision as to whether to approve a loan and determine the loan amount based on the applicant’s characteristics in order to maximize the banks’ profits obtained from these loans. The dataset contains the records and results of lending money to some customers. The dataset contains 1,000,000 clients; 50,000 (5%) of them defaulted. I have an imbalanced dataset.
+The main objective is to predict which applicants to give loan to based on their characteristics, and determine the loan amount for each applicant in order to maximize the bank’s profits obtained from these loans in a credit risk game setting. 
 
-At first I do data exploration to get some insights, fill missing values and visualize some features, apply undersampling with SMOTE technique then I develop a two-stage framework for the prediction. First, I build a binary classification model to estimate the probability of default for each individual. Then, I build a regression model to predict the amount to loan each individual who are predicted to be non-defaulters.
+The task is to classify client applications into default or non-default (binary classification problem), then predict the loan amount for those predicted as non-default (regression problem).
 
-## Modelling Approach
+I apply methods to a dataset with a size of 1 million rows and 32 columns. The dataset contains client records and the results of lending money to some customers. Out of 1000000 applications, 50000 (5%) of them defaults. I have an imbalanced dataset.
 
-I adopt a two-stage approach, classification followed by regression. 
+## Methodology
 
-First, I obtain the probability of default for each client based on their characteristics. The decision rule for giving out a loan is the following: if the probability is greater than cutoff value, the loan amount will be greater than zero. Otherwise, the loan amount will be zero.
+I do data exploration to get some insights, fill missing values and visualize some features, check correlation among features, and apply undersampling with SMOTE technique to obtain a balanced dataset.
 
-Second, for every client who is predicted as a non-defaulter, I predict a loan amount using the above regression models. If the predicted loan amount is lower than the requested loan amount, then I give the predicted loan amount. If the predicted loan amount is higher than the requested loan amount, then I give the requested loan amount. 
+I develop a two-stage framework for the task. First, I build a binary classification model to estimate the probability of default for each individual. if the probability is greater than cutoff value, the loan amount will be greater than zero. Otherwise, the loan amount will be zero. 
 
-The advantage of this method is that it is intuitive and easy to interpret.
+Then, I build a regression model to predict the loan amount for each individual who are predicted to be non-defaulters. If the predicted loan amount is lower than the requested loan amount, then I give the predicted loan amount. If the predicted loan amount is higher than the requested loan amount, then I give the requested loan amount. The advantage of this method is that it is intuitive and easy to interpret.
 
 ## Models
 
 ### Classification
 1. Logistic Regression (Baseline)
-2. XGBoost
-3. Adaboost
+2. XGBoost (one of the most popular ML algorithms and is known to yield highly accurate results.)
+3. Adaboost (usually a good classification method in cases with imbalanced data.)
 
 ### Regression
 1. XGBoost
-2. Blackboost
+2. Blackboost (a gradient boosting method where regression trees are utilized as base-learners.)
 
 In the classification task, logistic regression is the baseline because it is a simpler algorithm and does not require much time to build compared to other models. In logistic regression, I select variables using Lasso (L-1) regularization. I use XGBoost and Blackboost methods for the regression task.
-
-Adaboost is usually a good classification method in cases with imbalanced data.
-
-XGBoost is one of the most popular ML algorithms and is known to yield highly accurate results.
-
-Blackboost is a gradient boosting method where regression trees are utilized as base-learners.
-
