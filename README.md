@@ -33,7 +33,7 @@ I use F1 score as the performance measure which is known to provide robust resul
 
 In the classification task, logistic regression is the baseline because it is a simpler algorithm and does not require much time to build compared to other models. In logistic regression, I select variables using Lasso (L-1) regularization. I use XGBoost and Blackboost methods for the regression task.
 
-### Results
+## Results
 
 For the classification task, I obtain an F1 score of 0.963 found by the Adaboost model. Adaboost achieves a 6% improvement on the baseline model.
 
