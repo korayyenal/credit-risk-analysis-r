@@ -25,8 +25,16 @@ Then, I build a regression model to predict the loan amount for each individual 
 2. XGBoost (one of the most popular ML algorithms and is known to yield highly accurate results.)
 3. Adaboost (usually a good classification method in cases with imbalanced data.)
 
+I use F1 score as the performance measure which is known to provide robust results for imbalanced datasets.
+
 ### Regression
 1. XGBoost
 2. Blackboost (a gradient boosting method where regression trees are utilized as base-learners.)
 
 In the classification task, logistic regression is the baseline because it is a simpler algorithm and does not require much time to build compared to other models. In logistic regression, I select variables using Lasso (L-1) regularization. I use XGBoost and Blackboost methods for the regression task.
+
+### Results
+
+For the classification task, I obtain an F1 score of 0.963 found by the Adaboost model. Adaboost achieves a 6% improvement on the baseline model.
+
+For the regression task, I obtain an RMSE value of 10,100 found by the XGBoost and Blackboost models. 
