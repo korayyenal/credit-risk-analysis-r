@@ -945,18 +945,18 @@ xgb.plot.importance(importance_matrix, top_n = 10, measure = "Gain")
 
 ![](credit_risk_analysis_files/figure-gfm/unnamed-chunk-36-1.png)<!-- -->
 
-Variable importance graph shows that the three most important variables
-are:
+Variable importance graph shows that some of the most important
+variables are:
 
-1.  Total used amount of revolving credit (MNT_UTIL_REN),
-2.  Requested loan amount over the value of the goods (PRT_VAL), and
-3.  Value of financial liabilities (MNT_PASS).
+- Total used amount of revolving credit (MNT_UTIL_REN),
+- Requested loan amount over the value of the goods (PRT_VAL),
+- Value of financial liabilities (MNT_PASS), etc.
 
 The results make sense; clients with high financial liabilities or
 credit utilization tend to have a higher risk of default, while the
-ratio of requested loan amount to value of the goods tend to give a good
-indication as to whether the client can payback their debt by their
-savings or assets.
+ratio of requested loan amount to value of the assets/goods tend to give
+a good indication as to whether the client can payback their debt by
+their savings or assets.
 
 #### Blackboost
 
