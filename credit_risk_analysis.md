@@ -949,13 +949,13 @@ Variable importance graph shows that some of the most important
 variables are:
 
 - Total used amount of revolving credit (MNT_UTIL_REN),
-- Requested loan amount over the value of the goods (PRT_VAL),
+- Value of financial assets (MNT_ACT),
 - Value of financial liabilities (MNT_PASS), etc.
 
 The results make sense; clients with high financial liabilities or
 credit utilization tend to have a higher risk of default, while the
-ratio of requested loan amount to value of the assets/goods tend to give
-a good indication as to whether the client can payback their debt by
+ratio of requested loan amount to value of the assets tend to give an
+accurate indication as to whether the client can payback their debt by
 their savings or assets.
 
 #### Blackboost
