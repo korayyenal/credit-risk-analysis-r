@@ -35,6 +35,12 @@ In the classification task, logistic regression is the baseline because it is a 
 
 ## Results
 
+### Variable Importance
+
+![image](credit_risk_analysis_files/figure-gfm/unnamed-chunk-36-1.png)
+
+### F1 Score & RMSE
+
 For the classification task, I obtain an F1 score of 0.963 found by the Adaboost model. Adaboost achieves a 6% improvement on the baseline model.
 
 For the regression task, I obtain an RMSE value of 10,100 found by the XGBoost and Blackboost models. 
