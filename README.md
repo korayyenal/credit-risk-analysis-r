@@ -39,6 +39,14 @@ In the classification task, logistic regression is the baseline because it is a 
 
 ![image](credit_risk_analysis_files/figure-gfm/unnamed-chunk-36-1.png)
 
+Variable importance graph shows that some of the most important variables are:
+
+- Total used amount of revolving credit (MNT_UTIL_REN),
+- Value of financial assets (MNT_ACT),
+- Value of financial liabilities (MNT_PASS), etc.
+
+The results make sense; clients with high financial liabilities or credit utilization tend to have a higher risk of default, while the ratio of requested loan amount to value of the assets tend to give an accurate indication as to whether the client can payback their debt by their savings or assets.
+
 ### F1 Score & RMSE
 
 For the classification task, I obtain an F1 score of 0.963 found by the Adaboost model. Adaboost achieves a 6% improvement on the baseline model.
