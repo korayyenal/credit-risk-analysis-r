@@ -47,7 +47,7 @@ Variable importance graph shows that some of the most important variables are:
 
 The results make sense; clients with high financial liabilities or credit utilization tend to have a higher risk of default, while the ratio of requested loan amount to value of the assets tend to give an accurate indication as to whether the client can payback their debt by their savings or assets.
 
-### F1 Score & RMSE
+### Metrics: F1 Score & RMSE
 
 For the classification task, I obtain an F1 score of 96.3% found by Adaboost and 90% by the logistic regression. Thus, Adaboost achieves a 6% improvement on the baseline model.
 
