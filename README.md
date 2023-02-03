@@ -49,6 +49,6 @@ The results make sense; clients with high financial liabilities or credit utiliz
 
 ### F1 Score & RMSE
 
-For the classification task, I obtain an F1 score of 0.963 found by the Adaboost model. Adaboost achieves a 6% improvement on the baseline model.
+For the classification task, I obtain an F1 score of 96.3% found by Adaboost and 90% by the logistic regression. Thus, Adaboost achieves a 6% improvement on the baseline model.
 
-For the regression task, I obtain an RMSE value of 10,100 found by the XGBoost and Blackboost models. 
+For the regression task, I obtain an RMSE value of 10,100 found by the XGBoost and Blackboost. 
