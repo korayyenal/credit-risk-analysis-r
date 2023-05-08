@@ -4,7 +4,7 @@ The dataset can be accessed by this link: https://drive.google.com/file/d/102q3K
 
 ## Problem Description
 
-The main objective is to predict which applicants to give loan to based on their characteristics, and determine the loan amount for each applicant in order to maximize the bank’s profits obtained from these loans in a credit risk game setting. 
+In this project, the main objective is to predict which applicants to give loan to based on their characteristics, and determine the loan amount for each applicant in order to maximize the bank’s profits obtained from these loans in a credit risk game setting. 
 
 The task is to classify client applications into default or non-default (binary classification problem), then predict the loan amount for those predicted as non-default (regression problem).
 
