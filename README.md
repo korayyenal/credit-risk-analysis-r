@@ -38,7 +38,9 @@ Then, I build a regression model to predict the loan amount for each individual 
 2. XGBoost (one of the most popular ML algorithms and is known to yield highly accurate results.)
 3. Adaboost (usually a good classification method in cases with imbalanced data.)
 
-As the evaluation metric, I use the F1 score, which is known to provide robust results for imbalanced datasets. Logistic regression is the baseline because it is a simpler algorithm and does not require much time to build compared to other models. Within the logistic regression, I apply variable selection using Lasso (L-1) regularization.
+As the evaluation metric, I use the F1 score, which is known to provide robust results for imbalanced datasets. 
+
+Logistic regression is the baseline because it is a simpler algorithm and does not require much time to build compared to other models. Within the logistic regression, I apply variable selection using Lasso (L-1) regularization.
 
 ### Regression
 1. XGBoost
