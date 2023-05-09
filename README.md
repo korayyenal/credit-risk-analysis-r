@@ -1,7 +1,5 @@
 # Credit Risk Analysis
 
-The dataset can be accessed by this link: https://drive.google.com/file/d/102q3Ki7qN0pAW2i-WJsOYP1dhO9VEIaW/view?usp=share_link
-
 ## Problem Description
 
 In this project, I quantify the credit risk of individuals who apply for a loan at a bank. Specifically, I decide (1) which applicants to give loan to based on their characteristics, and (2) determine the loan amount given to each applicant. 
@@ -10,7 +8,11 @@ The objective is to maximize the bank’s profits obtained from these loans.
 
 The task is to classify loan applications into default or non-default (binary classification task), then predict the loan amount for those predicted as non-default (regression task).
 
+## Data
+
 I apply methods to an **imbalanced dataset** with a size of 1 million rows and 32 columns. Out of 1,000,000 loan applications, only 50,000 (5%) of them defaults. The dataset includes features about the customers and information about their default status as well as the magnitude of profit or loss incurred for each loan.
+
+The dataset can be accessed by this link: https://drive.google.com/file/d/102q3Ki7qN0pAW2i-WJsOYP1dhO9VEIaW/view?usp=share_link
 
 ## Methodology
 
