@@ -4,15 +4,23 @@ The dataset can be accessed by this link: https://drive.google.com/file/d/102q3K
 
 ## Problem Description
 
-In this project, the main objective is to predict which applicants to give loan to based on their characteristics, and determine the loan amount for each applicant in order to maximize the bank’s profits obtained from these loans in a credit risk game setting. 
+In this project, I quantify the credit risk of individuals who apply for a loan at a bank. Specifically, I decide (1) which applicants to give loan to based on their characteristics, and (2) determine the loan amount given to each applicant. 
 
-The task is to classify client applications into default or non-default (binary classification problem), then predict the loan amount for those predicted as non-default (regression problem).
+The objective is to maximize the bank’s profits obtained from these loans.
 
-I apply methods to a dataset with a size of 1 million rows and 32 columns. The dataset contains client records and the results of lending money to some customers. Out of 1000000 applications, 50000 (5%) of them defaults. I have an imbalanced dataset.
+The task is to classify loan applications into default or non-default (binary classification task), then predict the loan amount for those predicted as non-default (regression task).
+
+I apply methods to an **imbalanced dataset** with a size of 1 million rows and 32 columns. Out of 1,000,000 loan applications, only 50,000 (5%) of them defaults. The dataset includes features about the customers and information about their default status as well as the magnitude of profit or loss incurred for each loan.
 
 ## Methodology
 
-I do data exploration to get some insights, fill missing values and visualize some features, check correlation among features, and apply undersampling with SMOTE technique to obtain a balanced dataset.
+Some of the data pre-processing include:
+- identifying outliers
+- filling missing values
+- checking correlation and multicollinearity among variables
+- applying undersampling with SMOTE to handle class imbalance
+
+
 
 I develop a two-stage framework for the task. First, I build a binary classification model to estimate the probability of default for each individual. if the probability is greater than cutoff value, the loan amount will be greater than zero. Otherwise, the loan amount will be zero. 
 
@@ -25,13 +33,13 @@ Then, I build a regression model to predict the loan amount for each individual 
 2. XGBoost (one of the most popular ML algorithms and is known to yield highly accurate results.)
 3. Adaboost (usually a good classification method in cases with imbalanced data.)
 
-I use F1 score as the performance measure which is known to provide robust results for imbalanced datasets.
+I apply variable selection using Lasso (L-1) regularization.  As the evaluation metric, I use the F1 score, which is known to provide robust results for imbalanced datasets. Logistic regression is the baseline because it is a simpler algorithm and does not require much time to build compared to other models. 
 
 ### Regression
 1. XGBoost
 2. Blackboost (a gradient boosting method where regression trees are utilized as base-learners.)
 
-In the classification task, logistic regression is the baseline because it is a simpler algorithm and does not require much time to build compared to other models. In logistic regression, I select variables using Lasso (L-1) regularization. I use XGBoost and Blackboost methods for the regression task.
+As the evaluation metric, I use the MSE.
 
 ## Results
 
