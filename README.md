@@ -60,7 +60,7 @@ Variable importance graph shows that some of the most important variables are:
 - Value of financial assets (MNT_ACT),
 - Number of transactions refused due to insufficient funds in the last 12 months (NB_ER_12MS), etc.
 
-The results make sense; clients with low financial liabilities or low amount of revolving credit tend to have a higher risk of default, while the number of transactions refused due to insufficient funds in the last 12 months give an accurate indication as to whether the client can payback their debt by their savings or assets.
+The results make sense; clients with low financial liabilities or a very hih amount of revolving credit (i.e., high credit utilization) tend to have a higher risk of default, while the number of transactions refused due to insufficient funds in the last 12 months give an accurate indication as to whether the client can payback their debt by their savings or assets.
 
 ### Model Performances
 
