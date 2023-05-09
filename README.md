@@ -50,7 +50,7 @@ As the evaluation metric, I use the MSE.
 
 ## Results
 
-### Variable Importance
+### Identifying Important Features: Variable Importance
 
 ![image](credit_risk_analysis_files/figure-gfm/unnamed-chunk-36-1.png)
 
