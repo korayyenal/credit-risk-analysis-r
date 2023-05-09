@@ -14,13 +14,16 @@ I apply methods to an **imbalanced dataset** with a size of 1 million rows and 3
 
 ## Methodology
 
+### Data Pre-processing
+
 Some of the data pre-processing include:
-- identifying outliers
-- filling missing values
-- checking correlation and multicollinearity among variables
-- applying undersampling with SMOTE to handle class imbalance
+- eliminating redundant features,
+- filling missing values,
+- identifying outliers,
+- checking correlation and multicollinearity among variables, and
+- applying undersampling with SMOTE to handle class imbalance.
 
-
+### Model Design
 
 I develop a two-stage framework for the task. First, I build a binary classification model to estimate the probability of default for each individual. if the probability is greater than cutoff value, the loan amount will be greater than zero. Otherwise, the loan amount will be zero. 
 
@@ -33,7 +36,7 @@ Then, I build a regression model to predict the loan amount for each individual 
 2. XGBoost (one of the most popular ML algorithms and is known to yield highly accurate results.)
 3. Adaboost (usually a good classification method in cases with imbalanced data.)
 
-I apply variable selection using Lasso (L-1) regularization.  As the evaluation metric, I use the F1 score, which is known to provide robust results for imbalanced datasets. Logistic regression is the baseline because it is a simpler algorithm and does not require much time to build compared to other models. 
+As the evaluation metric, I use the F1 score, which is known to provide robust results for imbalanced datasets. Logistic regression is the baseline because it is a simpler algorithm and does not require much time to build compared to other models. Within the logistic regression, I apply variable selection using Lasso (L-1) regularization.
 
 ### Regression
 1. XGBoost
@@ -55,7 +58,7 @@ Variable importance graph shows that some of the most important variables are:
 
 The results make sense; clients with high financial liabilities or credit utilization tend to have a higher risk of default, while the ratio of requested loan amount to value of the assets tend to give an accurate indication as to whether the client can payback their debt by their savings or assets.
 
-### Metrics: F1 Score & RMSE
+### Model Performances
 
 For the classification task, I obtain an F1 score of 96.3% found by Adaboost and 90% by the logistic regression. Thus, Adaboost achieves a 6% improvement on the baseline model.
 
