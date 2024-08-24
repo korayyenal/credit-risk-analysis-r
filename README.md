@@ -64,8 +64,10 @@ The results make sense; clients with low financial liabilities or a very hih amo
 
 ### Model Performances
 
-![image](credit_risk_analysis_files/figure-gfm/Regression_table.png)
+<img src="credit_risk_analysis_files/figure-gfm/Regression_table.png" width=60% height=60%>
+
 For the classification task, I obtain an F1 score of 96.3% found by Adaboost and 90% by the logistic regression. Thus, Adaboost achieves a 6% improvement on the baseline model.
 
-![image](credit_risk_analysis_files/figure-gfm/Classification_table.png)
+<img src="credit_risk_analysis_files/figure-gfm/Classification_table.png" width=60% height=60%>
+
 For the regression task, I obtain an RMSE value of 10,100 found by the XGBoost and Blackboost. 
