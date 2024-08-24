@@ -46,7 +46,7 @@ Logistic regression is the baseline because it is a simpler algorithm and does n
 1. XGBoost
 2. Blackboost (a gradient boosting method where regression trees are utilized as base-learners.)
 
-As the evaluation metric, I use the MSE.
+As the evaluation metric, I use the RMSE.
 
 ## Results
 
