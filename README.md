@@ -1,5 +1,9 @@
 # Credit Risk Analysis
 
+## Project Summary Flowchart
+
+<img src="credit_risk_analysis_files/figure-gfm/Process_Flowchart.png" width=50% height=50%>
+
 ## Problem Description
 
 In this project, I quantify the credit risk of individuals who apply for a loan at a bank. Specifically, I decide (1) which applicants to give loan to based on their characteristics, and (2) determine the loan amount given to each applicant. 
