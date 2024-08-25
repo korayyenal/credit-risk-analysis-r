@@ -2,7 +2,7 @@
 
 ## Project Summary Flowchart
 
-<img src="credit_risk_analysis_files/figure-gfm/Process_Flowchart.png" width=50% height=50%>
+<img src="credit_risk_analysis_files/figure-gfm/Process_Flowchart.png">
 
 ## Problem Description
 
