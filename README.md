@@ -1,6 +1,6 @@
 # Credit Risk Analysis
 
-## Project Summary Flowchart
+## Summary Flowchart
 
 <img src="credit_risk_analysis_files/figure-gfm/Credit_Risk_Flowchart.png">
 
